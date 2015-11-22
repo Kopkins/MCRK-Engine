@@ -1,7 +1,3 @@
-#include <cstdlib>
-#include <bitset>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "KeyBuffer.h"
 
 KeyBuffer::KeyBuffer():

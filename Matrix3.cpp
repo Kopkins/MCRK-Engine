@@ -1,11 +1,4 @@
-#include <cstdlib>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <iostream>
 #include <cmath>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "Matrix3.h"
 
 namespace Math
@@ -309,7 +302,6 @@ namespace Math
 		    m1.getBack () - m2.getBack ());
   }
 
-// Unary negation
   Matrix3
   operator- (const Matrix3& m)
   {

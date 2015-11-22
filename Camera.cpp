@@ -1,14 +1,3 @@
-#include <cstdlib>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "ShaderProgram.h"
 #include "Camera.h"
 #include "Vector3.h"
@@ -42,39 +31,8 @@ Camera::moveBack (float distance)
 }
 
 void
-Camera::createModelViewMatrix (ShaderProgram& shaderProg, float array[16])
-{
-
-  shaderProg.enable ();
-  GLint modelViewLoc = shaderProg.getUniformLocation ("vModelView");
-
-  Matrix3 mat = m_camera.getOrientation();
-  mat.transpose();
-  Vector3 vec = m_camera.getPosition();
-  vec.negate();
-  vec=mat*vec;
-  Transform view(mat,vec);
-
-  float modelView[16];
-  Transform meshTransform (array);
-  Transform combined = view.combine (meshTransform);
-  combined.getTransform(modelView);
-
-  shaderProg.setUniformMatrix4fv (modelViewLoc, 1, GL_FALSE, modelView);
-
-}
-
-void
 Camera::createProjectionMatrix (ShaderProgram& shaderProg)
 {
-  /*
-  shaderProg.enable ();
-  GLint projectionLoc = shaderProg.getUniformLocation ("vProjection");
-  glm::mat4 projection = glm::perspective (m_verticalFov, m_aspectRatio,
-					   m_nearZ, m_farZ);
-  shaderProg.setUniformMatrix4fv (projectionLoc, 1, GL_FALSE,
-				  glm::value_ptr (projection));
-				  */
   m_projection.setToPerspectiveProjection(m_verticalFov,m_aspectRatio,m_nearZ,m_farZ);
   float projection[16];
   m_projection.getAsArray(projection);
@@ -87,14 +45,6 @@ Camera::createProjectionMatrix (ShaderProgram& shaderProg)
 void
 Camera::createProjectionMatrix (ShaderProgram& shaderProg, bool orthographic)
 {
-  /*
-  shaderProg.enable ();
-  GLint projectionLoc = shaderProg.getUniformLocation ("vProjection");
-  glm::mat4 projection = glm::perspective (m_verticalFov, m_aspectRatio,
-					   m_nearZ, m_farZ);
-  shaderProg.setUniformMatrix4fv (projectionLoc, 1, GL_FALSE,
-				  glm::value_ptr (projection));
-				  */
   m_projection.setToOrthographicProjection(-2,2,-1.5,1.5,m_nearZ,m_farZ);
   float projection[16];
   m_projection.getAsArray(projection);
@@ -227,4 +177,11 @@ Camera::reset ()
 {
   m_camera.reset();
 }
+
+void
+Camera::getTransform (float array[16]) const
+{
+  m_camera.getTransform (array);
+}
+
 

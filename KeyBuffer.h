@@ -1,7 +1,6 @@
 #ifndef keybuffer_h
 #define keybuffer_h
 
-#include <cstdlib>
 #include <bitset>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

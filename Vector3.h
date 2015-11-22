@@ -1,11 +1,6 @@
 #ifndef Vector3_h
 #define Vector3_h
 
-#include <cstdlib>
-#include <string>
-#include <glm/vec3.hpp>
-
-
 class Vector3{
   
 public:
@@ -32,6 +27,8 @@ public:
   
   void normalize();
   
+  float* data();
+
   Vector3& operator+= (const Vector3& v);
   
   Vector3& operator-= (const Vector3& v);
@@ -39,8 +36,6 @@ public:
   Vector3& operator*= (float s);
   
   Vector3& operator/= (float s);
-  
-  glm::vec3 toVec3();
 
 };
 

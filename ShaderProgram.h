@@ -3,30 +3,14 @@
 
 #include <string>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 class ShaderProgram
 {
-
-  GLuint m_vertexShader, m_fragmentShader, m_programId;
-
-  void
-  createShader (GLuint shadertype, std::string file);
-
-  const char*
-  readFile (std::string file);
-
-  void
-  checkCompileSuccess (GLuint shader, std::string file);
-
-  void
-  checkLinkSuccess ();
-
 public:
 
-  ShaderProgram();
+  ShaderProgram ();
 
-  //~ShaderProgram();
+  ~ShaderProgram();
 
   void
   createProgramId ();
@@ -41,20 +25,45 @@ public:
   link ();
 
   GLint
- getAttributeLocation (std::string position) const;
+  getAttributeLocation (std::string position) const;
 
   GLint
- getUniformLocation (std::string position) const;
+  getUniformLocation (std::string position) const;
 
   void
   setUniformMatrix4fv (int uniformlocation, int count, unsigned char transpose,
 		       float* matrix);
 
   void
+  setUniform3fv (int uniformlocation, int count, float* vector);
+
+  void
+  setUniform1f (int uniformlocation, float floot);
+
+  void
+  setUniform3fv ();
+
+  void
   enable ();
 
   void
   disable ();
+
+private:
+
+  GLuint m_vertexShader, m_fragmentShader, m_programId;
+
+  void
+  createShader (GLuint shadertype, std::string file);
+
+  const char*
+  readFile (std::string file);
+
+  void
+  checkCompileSuccess (GLuint shader, std::string file);
+
+  void
+  checkLinkSuccess ();
 
 };
 

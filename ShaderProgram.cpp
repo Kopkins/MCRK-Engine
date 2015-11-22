@@ -1,26 +1,20 @@
 #include <cstdio>
-#include <cstdlib>
+#include <iostream>
 #include <string>
 #include <fstream>
-#include <iostream>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "ShaderProgram.h"
 
-ShaderProgram::ShaderProgram():
-m_vertexShader(), m_fragmentShader(), m_programId()
+ShaderProgram::ShaderProgram () :
+    m_vertexShader (), m_fragmentShader (), m_programId ()
 {
 
 }
 
-/*
-ShaderProgram::~ShaderProgram(){
-  //glDeleteProgram(m_programId);
-  glDeleteShader(m_vertexShader);
-  glDeleteShader(m_fragmentShader);
-}
-*/
+ShaderProgram::~ShaderProgram ()
+{
 
+}
 
 void
 ShaderProgram::createShader (GLuint shadertype, std::string file)
@@ -34,16 +28,16 @@ ShaderProgram::createShader (GLuint shadertype, std::string file)
 const char*
 ShaderProgram::readFile (std::string file)
 {
-std::ifstream infile;
-infile.open(file.c_str());
-infile.seekg(0,infile.end);
-int length = infile.tellg();
-infile.seekg(0,infile.beg);
-char* data = new char [length+1];
-infile.read(data,length);
-infile.close();
-data[length]= '\0';
-return data;
+  std::ifstream infile;
+  infile.open (file.c_str ());
+  infile.seekg (0, infile.end);
+  int length = infile.tellg ();
+  infile.seekg (0, infile.beg);
+  char* data = new char[length + 1];
+  infile.read (data, length);
+  infile.close ();
+  data[length] = '\0';
+  return data;
 
 }
 
@@ -66,7 +60,8 @@ ShaderProgram::checkCompileSuccess (GLuint shader, std::string file)
 	  fragfile.open (filename);
 	  fragfile << log;
 	  glDeleteShader (m_fragmentShader);
-	  std::cout << "Error! Could not compile m_fragmentShader shader. Please see "
+	  std::cout
+	      << "Error! Could not compile m_fragmentShader shader. Please see "
 	      << file << ".log for details." << std::endl;
 	}
       else if (shader == m_vertexShader)
@@ -76,7 +71,8 @@ ShaderProgram::checkCompileSuccess (GLuint shader, std::string file)
 	  vertfile.open (filename);
 	  vertfile << log;
 	  glDeleteShader (m_vertexShader);
-	  std::cout << "Error! Could not compile m_vertexShader shader. Please see "
+	  std::cout
+	      << "Error! Could not compile m_vertexShader shader. Please see "
 	      << file << ".log for details." << std::endl;
 	}
     }
@@ -99,66 +95,81 @@ ShaderProgram::checkLinkSuccess ()
       progfile << log;
       glDeleteProgram (m_programId);
       std::cout
-  << "Error! Could not attach shaders. Please see Vec2.log for details."<< std::endl;
-}
+	  << "Error! Could not attach shaders. Please see Vec2.log for details."
+	  << std::endl;
+    }
 
 }
 
 void
 ShaderProgram::createProgramId ()
 {
-m_programId = glCreateProgram ();
+  m_programId = glCreateProgram ();
 }
 
 void
 ShaderProgram::createVertexShader (std::string file)
 {
-m_vertexShader = glCreateShader (GL_VERTEX_SHADER);
-createShader (m_vertexShader, file);
+  m_vertexShader = glCreateShader (GL_VERTEX_SHADER);
+  createShader (m_vertexShader, file);
 }
 
 void
 ShaderProgram::createFragmentShader (std::string file)
 {
-m_fragmentShader = glCreateShader (GL_FRAGMENT_SHADER);
-createShader (m_fragmentShader, file);
+  m_fragmentShader = glCreateShader (GL_FRAGMENT_SHADER);
+  createShader (m_fragmentShader, file);
 }
 
 void
 ShaderProgram::link ()
 {
-glAttachShader (m_programId, m_vertexShader);
-glAttachShader (m_programId, m_fragmentShader);
-glLinkProgram (m_programId);
-checkLinkSuccess ();
+  glAttachShader (m_programId, m_vertexShader);
+  glAttachShader (m_programId, m_fragmentShader);
+  glLinkProgram (m_programId);
+  checkLinkSuccess ();
 }
 
 GLint
 ShaderProgram::getAttributeLocation (std::string position) const
 {
-return glGetAttribLocation (m_programId, position.c_str ());
+  return glGetAttribLocation (m_programId, position.c_str ());
 }
 
 GLint
 ShaderProgram::getUniformLocation (std::string position) const
 {
-return glGetUniformLocation (m_programId, position.c_str());
+  return glGetUniformLocation (m_programId, position.c_str ());
 }
 
 void
-ShaderProgram::setUniformMatrix4fv(int uniformlocation, int count, unsigned char transpose, float* matrix){
-  glUniformMatrix4fv(uniformlocation, count, transpose, matrix);
+ShaderProgram::setUniformMatrix4fv (int uniformlocation, int count,
+				    unsigned char transpose, float* matrix)
+{
+  glUniformMatrix4fv (uniformlocation, count, transpose, matrix);
+}
+
+void
+ShaderProgram::setUniform3fv (int uniformlocation, int count, float* vector)
+{
+  glUniform3fv (uniformlocation, count, vector);
+}
+
+void
+ShaderProgram::setUniform1f (int uniformlocation, float floot)
+{
+  glUniform1f (uniformlocation, floot);
 }
 
 void
 ShaderProgram::enable ()
 {
-glUseProgram (m_programId);
+  glUseProgram (m_programId);
 }
 
 void
 ShaderProgram::disable ()
 {
-glUseProgram (0);
+  glUseProgram (0);
 }
 

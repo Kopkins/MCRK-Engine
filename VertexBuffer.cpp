@@ -1,10 +1,5 @@
-#include <cstdlib>
-#include <cstdio>
-#include <string>
 #include <vector>
-#include <iostream>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "VertexBuffer.h"
 
 VertexBuffer::VertexBuffer () :
@@ -43,8 +38,6 @@ VertexBuffer::getVbo(){
 
 void
 VertexBuffer::setData(std::vector<float> vertices){
-
-  //m_vertexData=
 
 }
 

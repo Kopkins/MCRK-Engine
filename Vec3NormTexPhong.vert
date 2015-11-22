@@ -35,9 +35,11 @@ struct Material
   float shininess;
 };
 
-uniform Material material = Material (vec3 (0.1, 0.1, 0.2), 
-        	                      vec3 (0.75, 0.75, 0.8),
-                 		      vec3 (0.75, 0.75, 0.8), 16.0);
+uniform Material material;
+
+//uniform Material material = Material (vec3 (0.1, 0.1, 0.2), 
+//        	                      vec3 (0.75, 0.75, 0.8),
+//                 		      vec3 (0.75, 0.75, 0.8), 16.0);
 
 void
 main ()

@@ -2,25 +2,12 @@
 #define Camera_h
 
 #include <cstdlib>
-#include <glm/mat4x4.hpp>
-#include <bitset>
 #include "ShaderProgram.h"
-#include "Vector3.h"
-#include "Matrix3.h"
 #include "Transform.h"
 #include "Matrix4.h"
 
 class Camera
 {
-
-  Math::Transform m_camera;
-  float m_verticalFov, m_aspectRatio, m_nearZ, m_farZ;
-  Math::Matrix4 m_projection;
-  bool m_isOrtho;
-
-  Vector3
-  getRight (); //LOL Ninjas in Pyjamas
-
 public:
 
   Camera ();
@@ -33,9 +20,6 @@ public:
 
   void
   moveBack (float distance);
-
-  void
-  createModelViewMatrix (ShaderProgram& shaderProg, float array[16]);
 
   void
   createProjectionMatrix (ShaderProgram& shaderProg);
@@ -105,6 +89,19 @@ public:
 
   void
   reset ();
+
+  void
+  getTransform (float array[16]) const;
+
+private:
+
+  Math::Transform m_camera;
+  float m_verticalFov, m_aspectRatio, m_nearZ, m_farZ;
+  Math::Matrix4 m_projection;
+  bool m_isOrtho;
+
+  Vector3
+  getRight (); //LOL Ninjas in Pyjamas
 
 };
 

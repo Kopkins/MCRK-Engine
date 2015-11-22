@@ -1,31 +1,12 @@
-/* Z Engine 2.0
- Uses OpenGL 3.3 technology
- by Gary M. Zoppetti
- */
-
 /******************************************************************/
-// System includes
+//Includes
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <vector>
-
-// Use GLEW so we can access the latest OpenGL functionality
-// Always include GLEW before GLFW!
 #include <GL/glew.h>
-// Use GLFW so we can create windows and handle events in a
-//   platform-independent way
 #include <GLFW/glfw3.h>
-
-// GLM is a header-only library, so we do not need to link to it
-// Vector and matrix classes
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
-// Need for "value_ptr"
-#include <glm/gtc/type_ptr.hpp>
-// Transforms like rotation, view, and projection
-#include <glm/gtc/matrix_transform.hpp>
-
+#include <glm/trigonometric.hpp>
 /******************************************************************/
 // Local includes
 #include "ShaderProgram.h"
@@ -36,6 +17,7 @@
 #include "AiScene.h"
 #include "Transform.h"
 #include "KeyBuffer.h"
+#include "Scene.h"
 /******************************************************************/
 // Making a struct to hold our mouse data to prevent the use of too many global variables
 namespace
@@ -57,12 +39,11 @@ namespace
 /******************************************************************/
 // Type declarations/globals vars/prototypes
 ShaderProgram g_shaderProgram;
-//Mesh* g_mesh;
-std::vector<Mesh*> g_meshVector;
 Camera g_cam;
 KeyBuffer g_keybuffer;
 bool g_isWire;
 MouseHandler g_mouse;
+Scene g_scene;
 /******************************************************************/
 
 void
@@ -136,7 +117,6 @@ main (int argc, char* argv[])
   init (window);
   g_isWire=false;
 
-  // Game/render loop
   double previousTime = glfwGetTime ();
   while (!glfwWindowShouldClose (window))
     {
@@ -161,12 +141,10 @@ main (int argc, char* argv[])
 void
 init (GLFWwindow*& window)
 {
-  // Always initialize GLFW before GLEW
   initGlfw ();
   initWindow (window);
   initGlew ();
   initScene ();
-
 }
 
 /******************************************************************/
@@ -187,16 +165,10 @@ initGlfw ()
 void
 initWindow (GLFWwindow*& window)
 {
-//#ifdef __APPLE__
-//  glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-//  glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
-//  glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//  glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//#endif
   glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
   window = glfwCreateWindow (1200, 900, "OpenGL", nullptr, nullptr);
-  glfwSetWindowPos (window, 200, 100);
+  glfwSetWindowPos (window, 0, 0);
   if (!window)
     {
       fprintf (stderr, "Failed to initialize the window\n");
@@ -208,7 +180,6 @@ initWindow (GLFWwindow*& window)
   // Swap buffers after 1 frame
   glfwSwapInterval (1);
   glfwSetKeyCallback (window, processKey);
-  // GMZ: Don't track mouse movement yet
   glfwSetCursorPosCallback (window, processMousePosition);
   glfwSetMouseButtonCallback (window, processMouseButton);
   glfwSetFramebufferSizeCallback (window, resetViewport);
@@ -265,12 +236,15 @@ initScene ()
 {
   initShaders ();
   initCamera ();
-  AiScene Model ("Sphere.obj");
-  std::shared_ptr<VertexBuffer> sphere = Model.readVertexData (0);
-  g_meshVector.push_back (new Mesh);
+  Material mat(Vector3(0.1, 0.1, 0.2),Vector3(0.75,0.75,0.8),Vector3(0.75,0.75,0.8),128.0f);
+  g_scene.createMesh("first", "Sphere.obj", "EarthBath.png", mat, &g_shaderProgram);
+  //g_meshVector.push_back (new Mesh);
   //std::vector<float> print = *sphere;
-  g_meshVector[0]->addGeometry (sphere);
-  g_meshVector[0]->loadTexture ("EarthBath.png");
+  //g_meshVector[0]->addGeometry (sphere);
+  //g_meshVector[0]->setShaderPointer(&g_shaderProgram);
+  //g_meshVector[0]->loadTexture ("EarthBath.png");
+  //g_meshVector[0]->activateMaterial();
+  //g_meshVector[0]->prepareVao ();
 
 }
 
@@ -283,7 +257,7 @@ initCamera ()
   g_cam.setNearZ (0.01f);
   g_cam.setFarZ (40.0f);
   g_cam.createProjectionMatrix (g_shaderProgram);
-  g_cam.setEye (0.0f, 0.0f, 12.0f);
+  g_cam.setEye (0.0f, 0.0f, 6.0f);
   g_cam.setUp (0, 1, 0);
 
 }
@@ -307,11 +281,6 @@ updateScene (double time)
   const float SCALESHEAR_DELTA = 1.1f;
   updateCamera (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA);
   updateMesh (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA, SCALESHEAR_DELTA);
-  //g_cam.updateCamera (g_keybuffer.getBuffer (), MOVEMENT_DELTA, ROTATION_DELTA);
-  // g_meshVector[g_meshVector.size () - 1]->updateMesh (g_keybuffer.getBuffer (),
-  //MOVEMENT_DELTA,
-  //ROTATION_DELTA,
-  //SCALESHEAR_DELTA);
 }
 
 /******************************************************************/
@@ -337,25 +306,26 @@ updateMesh (KeyBuffer keybuffer, float moveDelta, float rotateDelta,
 	    float shearDelta)
 {
   std::bitset<GLFW_KEY_LAST> buffer = keybuffer.getBuffer ();
-  g_meshVector[g_meshVector.size () - 1]->moveRight (
+  Mesh* mesh = g_scene.getActive();
+  mesh->moveRight (
       buffer[GLFW_KEY_1] * moveDelta);
-  g_meshVector[g_meshVector.size () - 1]->pitch (
+  mesh->pitch (
       buffer[GLFW_KEY_2] * rotateDelta);
-  g_meshVector[g_meshVector.size () - 1]->yaw (
+  mesh->yaw (
       buffer[GLFW_KEY_3] * rotateDelta);
-  g_meshVector[g_meshVector.size () - 1]->roll (
+  mesh->roll (
       buffer[GLFW_KEY_4] * rotateDelta);
   if (buffer[GLFW_KEY_5])
-    g_meshVector[g_meshVector.size () - 1]->alignWithWorldY ();
+    mesh->alignWithWorldY ();
   if (buffer[GLFW_KEY_6])
-    g_meshVector[g_meshVector.size () - 1]->scaleLocal (shearDelta);
+    mesh->scaleLocal (shearDelta);
   if (buffer[GLFW_KEY_7])
-    g_meshVector[g_meshVector.size () - 1]->scaleWorld (shearDelta);
-  g_meshVector[g_meshVector.size () - 1]->shearLocalXByYz (
+    mesh->scaleWorld (shearDelta);
+  mesh->shearLocalXByYz (
       buffer[GLFW_KEY_8] * shearDelta, buffer[GLFW_KEY_8] * shearDelta);
-  g_meshVector[g_meshVector.size () - 1]->shearLocalYByXz (
+  mesh->shearLocalYByXz (
       buffer[GLFW_KEY_9] * shearDelta, buffer[GLFW_KEY_9] * shearDelta);
-  g_meshVector[g_meshVector.size () - 1]->shearLocalZByXy (
+  mesh->shearLocalZByXy (
       buffer[GLFW_KEY_0] * shearDelta, buffer[GLFW_KEY_0] * shearDelta);
 }
 
@@ -375,18 +345,10 @@ drawScene (GLFWwindow* window)
 void
 drawObject ()
 {
-  float meshTransform[16];
-  for (uint i = 0; i < g_meshVector.size (); i++)
-    {
-      g_meshVector[i]->prepareVao (g_shaderProgram);
-      g_meshVector[i]->getTransform (meshTransform);
-      g_cam.createModelViewMatrix (g_shaderProgram, meshTransform);
-      g_meshVector[i]->draw (g_shaderProgram);
-    }
-  //g_meshVector[0]->getTransform(meshTransform);
-  //g_cam.createModelViewMatrix(g_shaderProgram, meshTransform);
-  //g_meshVector[0]->draw (g_shaderProgram);
-
+	float camTransform[16];
+	g_cam.getTransform(camTransform);
+	g_scene.getActive()->createModelViewMatrix(camTransform);
+	g_scene.getActive()->draw();
 }
 
 /******************************************************************/
@@ -404,16 +366,17 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS)
     {
       //Mesh* clone = g_meshVector[0]->clone();
-      g_meshVector.push_back (g_meshVector[0]->clone ());
+      /*g_meshVector.push_back (g_meshVector[0]->clone ());
       g_meshVector[g_meshVector.size () - 1]->setPosition (
 	  g_meshVector[g_meshVector.size () - 2]->getPosition ().x - .4,
 	  g_meshVector[g_meshVector.size () - 2]->getPosition ().y + .4,
 	  g_meshVector[g_meshVector.size () - 2]->getPosition ().z);
+    	*/
     }
   if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
     {
-      delete g_meshVector[g_meshVector.size () - 1];
-      g_meshVector.pop_back ();
+      //delete g_meshVector[g_meshVector.size () - 1];
+      //g_meshVector.pop_back ();
     }
   if (key == GLFW_KEY_P && action == GLFW_PRESS)
     {
@@ -444,8 +407,6 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
 void
 processMousePosition (GLFWwindow* window, double x, double y)
 {
-  // "x" and "y" are screen (NOT window) coordinates, with
-  //   (0.0, 0.0) at the upper left of the window
   float dx, dy, dz;
   if (g_mouse.lClick)
     {
@@ -477,7 +438,6 @@ processMousePosition (GLFWwindow* window, double x, double y)
 void
 processMouseButton (GLFWwindow* window, int button, int action, int modifiers)
 {
-  // Other relevant constants are GLFW_MOUSE_BUTTON_RIGHT and GLFW_RELEASE
   if (button == GLFW_MOUSE_BUTTON_LEFT) {
 	  g_mouse.lClick = action;
 

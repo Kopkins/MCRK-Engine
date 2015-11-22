@@ -1,13 +1,5 @@
-#include <cstdlib>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <iostream>
 #include <cmath>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "Vector3.h"
-
 
 Vector3::Vector3() :
   x(), y(), z()
@@ -61,6 +53,10 @@ void Vector3::normalize(){
   z=z/length();
 }
 
+float* Vector3::data(){
+  return &x;
+}
+
 Vector3& Vector3::operator+=(const Vector3& v){
   this->x=x+v.x;
   this->y=y+v.y;
@@ -87,10 +83,6 @@ Vector3& Vector3::operator/=(float s){
   this->y=y/s;
   this->z=z/s;
   return *this;
-}
-
-glm::vec3 Vector3::toVec3(){
-  return glm::vec3(x, y, z);
 }
 
 namespace Math{

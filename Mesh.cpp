@@ -1,17 +1,12 @@
-#include <cstdlib>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "Mesh.h"
 #include "Texture.h"
+#include "Transform.h"
 
 #define BUFFER_OFFSET(byteOffset) (reinterpret_cast<void *> (byteOffset))
 
 Mesh::Mesh () :
-    m_vao (), m_transform (), m_tex (new Texture)
+    m_vao (), m_transform (), m_tex (new Texture), m_material (), m_shader (
+	nullptr)
 {
   glGenVertexArrays (1, &m_vao);
 }
@@ -28,7 +23,7 @@ Mesh::addGeometry (std::shared_ptr<VertexBuffer> newvertices)
 }
 
 void
-Mesh::prepareVao (const ShaderProgram shader)
+Mesh::prepareVao ()
 {
   glBindVertexArray (m_vao);
   glBindBuffer (GL_ARRAY_BUFFER, m_vertexBuffer->getVbo ());
@@ -36,17 +31,17 @@ Mesh::prepareVao (const ShaderProgram shader)
   int size = m_vertexBuffer->size () * sizeof(float);
   glBufferData (GL_ARRAY_BUFFER, size, m_vertexBuffer->data (), GL_STATIC_DRAW);
 
-  GLint posAttrib = shader.getAttributeLocation ("vPosition");
+  GLint posAttrib = m_shader->getAttributeLocation ("vPosition");
   glEnableVertexAttribArray (posAttrib);
   glVertexAttribPointer (posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			 BUFFER_OFFSET(0));
 
-  GLint colorAttrib = shader.getAttributeLocation ("vNormal");
+  GLint colorAttrib = m_shader->getAttributeLocation ("vNormal");
   glEnableVertexAttribArray (colorAttrib);
   glVertexAttribPointer (colorAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			 BUFFER_OFFSET(3 * sizeof(float)));
 
-  GLint texAttrib = shader.getAttributeLocation ("vTexCoord");
+  GLint texAttrib = m_shader->getAttributeLocation ("vTexCoord");
   glEnableVertexAttribArray (texAttrib);
   glVertexAttribPointer (texAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			 BUFFER_OFFSET(6 * sizeof(float)));
@@ -60,16 +55,16 @@ Mesh::loadTexture (std::string file)
 }
 
 void
-Mesh::draw (ShaderProgram shader)
+Mesh::draw ()
 {
-  shader.enable ();
+  m_shader->enable ();
   glActiveTexture (GL_TEXTURE0);
   m_tex->bind ();
   glBindVertexArray (m_vao);
   glDrawArrays (GL_TRIANGLES, 0, m_vertexBuffer->size () / 6);
   glBindVertexArray (0);
   m_tex->unbind ();
-  shader.disable ();
+  m_shader->disable ();
 }
 
 void
@@ -174,12 +169,6 @@ Mesh::shearLocalZByXy (float shearX, float shearY)
   m_transform.shearLocalZByXy (shearX, shearY);
 }
 
-void
-Mesh::getTransform (float array[16]) const
-{
-  m_transform.getTransform (array);
-}
-
 Vector3
 Mesh::getPosition () const
 {
@@ -192,13 +181,25 @@ Mesh::setPosition (float x, float y, float z)
   m_transform.setPosition (x, y, z);
 }
 
-/*
- void Mesh::clone(std::vector<Mesh*>& meshVector){
- meshVector.push_back(new Mesh);
- meshVector[meshVector.size()-1]->addGeometry(m_vertexBuffer);
- meshVector[meshVector.size()-1]->setPosition(meshVector[meshVector.size()-2]->getPosition().x-.4,meshVector[meshVector.size()-2]->getPosition().y+.4,meshVector[meshVector.size()-2]->getPosition().z);
- }
- */
+void
+Mesh::createModelViewMatrix (float array[16])
+{
+  Math::Transform camTransform (array);
+  Math::Matrix3 mat = camTransform.getOrientation ();
+  mat.transpose ();
+  Vector3 vec = camTransform.getPosition ();
+  vec.negate ();
+  vec = mat * vec;
+  Math::Transform view (mat, vec);
+
+  float modelView[16];
+  Math::Transform combined = view.combine (m_transform);
+  combined.getTransform (modelView);
+
+  m_shader->enable ();
+  GLint modelViewLoc = m_shader->getUniformLocation ("vModelView");
+  m_shader->setUniformMatrix4fv (modelViewLoc, 1, GL_FALSE, modelView);
+}
 
 Mesh*
 Mesh::clone ()
@@ -208,6 +209,7 @@ Mesh::clone ()
   ret->m_transform = m_transform;
   ret->m_vao = m_vao;
   ret->m_vertexBuffer = m_vertexBuffer;
+  ret->m_material = m_material;
   return ret;
 }
 
@@ -221,5 +223,24 @@ void
 Mesh::setMaterial (const Material& material)
 {
   m_material = material;
+}
+
+void
+Mesh::setShaderPointer (ShaderProgram* shader)
+{
+  m_shader = shader;
+}
+
+void
+Mesh::activateMaterial ()
+{
+  GLint materialLoc = m_shader->getUniformLocation ("material.ambientRefl");
+  m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
+  materialLoc = m_shader->getUniformLocation ("material.diffuseRefl");
+  m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
+  materialLoc = m_shader->getUniformLocation ("material.specularRefl");
+  m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
+  materialLoc = m_shader->getUniformLocation ("material.shininess");
+  m_shader->setUniform1f (materialLoc, m_material.shininess);
 }
 

@@ -1,12 +1,8 @@
 #ifndef Mesh_h
 #define Mesh_h
 
-#include <cstdlib>
-#include <string>
-#include <vector>
 #include <memory>
-#include <bitset>
-#include <assimp/postprocess.h>
+#include <vector>
 #include "ShaderProgram.h"
 #include "Transform.h"
 #include "Texture.h"
@@ -15,13 +11,6 @@
 
 class Mesh{
   
-
-  GLuint m_vao;
-  std::shared_ptr<VertexBuffer> m_vertexBuffer;
-  Math::Transform m_transform;
-  std::shared_ptr<Texture> m_tex;
-  Material m_material;
-
 public:
 
   Mesh();
@@ -34,11 +23,11 @@ public:
   
   void outputGeometry();
 
-  void prepareVao(const ShaderProgram shaderprogram);
+  void prepareVao();
   
   void loadTexture(std::string file);
 
-  void draw(ShaderProgram shader);
+  void draw();
 
   // Key: "1"
   void
@@ -109,7 +98,8 @@ public:
 
   void setPosition(float x, float y, float z);
 
-  //void clone(std::vector<Mesh*>& meshVector);
+  void
+  createModelViewMatrix (float array[16]);
 
   Mesh* clone();
 
@@ -118,6 +108,22 @@ public:
 
   void
   setMaterial (const Material& material);
+
+  void
+  setShaderPointer(ShaderProgram* shader);
+
+  void
+  activateMaterial ();
+
+private:
+
+  GLuint m_vao;
+  std::shared_ptr<VertexBuffer> m_vertexBuffer;
+  Math::Transform m_transform;
+  std::shared_ptr<Texture> m_tex;
+  Material m_material;
+  ShaderProgram* m_shader;
+
 };
 
 #endif

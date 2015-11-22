@@ -1,14 +1,9 @@
 #ifndef VertexBuffer_h
 #define VertexBuffer_h
 
-#include <cstdlib>
 #include <GL/glew.h>
 
 class VertexBuffer{
-
-std::vector<float> m_vertexData;
-GLuint	m_vbo;
-
 
 public:
 
@@ -25,6 +20,11 @@ unsigned int size();
 void setData(std::vector<float> vertices);
 
 GLuint getVbo();
+
+private:
+
+std::vector<float> m_vertexData;
+GLuint	m_vbo;
 
 };
 

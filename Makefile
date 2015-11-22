@@ -32,7 +32,7 @@ LDPATHS :=
 LDLIBS := -lGLEW -lglfw -lGL -lGLU -lassimp -lfreeimageplus
 
 # All source files, separated by spaces. Don't include header files. 
-SRCS := Main.cpp ShaderProgram.cpp Mesh.cpp Vector3.cpp Camera.cpp Matrix3.cpp AiScene.cpp Transform.cpp KeyBuffer.cpp Matrix4.cpp Texture.cpp VertexBuffer.cpp
+SRCS := Main.cpp ShaderProgram.cpp Mesh.cpp Vector3.cpp Camera.cpp Matrix3.cpp AiScene.cpp Transform.cpp KeyBuffer.cpp Matrix4.cpp Texture.cpp VertexBuffer.cpp Scene.cpp
 
 # Extension for source files
 SOURCESUFFIX := cpp

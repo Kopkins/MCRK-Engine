@@ -210,6 +210,7 @@ Mesh::clone ()
   ret->m_vao = m_vao;
   ret->m_vertexBuffer = m_vertexBuffer;
   ret->m_material = m_material;
+  ret->m_shader = m_shader;
   return ret;
 }
 

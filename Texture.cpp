@@ -53,6 +53,7 @@ Texture::setData (const std::string& textureFile)
 
   if(!ok){
       std::cout<<"Failed to load texture from file\n";
+      exit(-1);
   }
 
   unsigned int width = image.getWidth ();

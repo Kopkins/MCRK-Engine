@@ -84,9 +84,6 @@ void
 drawScene (GLFWwindow* window);
 
 void
-drawObject ();
-
-void
 processKey (GLFWwindow* window, int key, int scanCode, int action,
 	    int modifiers);
 
@@ -237,6 +234,7 @@ initScene ()
   initShaders ();
   initCamera ();
   Material mat(Vector3(0.1, 0.1, 0.2),Vector3(0.75,0.75,0.8),Vector3(0.75,0.75,0.8),128.0f);
+  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", mat, &g_shaderProgram);
   g_scene.createMesh("first", "Sphere.obj", "EarthBath.png", mat, &g_shaderProgram);
   //g_meshVector.push_back (new Mesh);
   //std::vector<float> print = *sphere;
@@ -335,20 +333,9 @@ drawScene (GLFWwindow* window)
 {
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  drawObject ();
+  g_scene.draw(g_cam);
 
   glfwSwapBuffers (window);
-}
-
-/******************************************************************/
-
-void
-drawObject ()
-{
-	float camTransform[16];
-	g_cam.getTransform(camTransform);
-	g_scene.getActive()->createModelViewMatrix(camTransform);
-	g_scene.getActive()->draw();
 }
 
 /******************************************************************/
@@ -365,18 +352,13 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
     }
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS)
     {
-      //Mesh* clone = g_meshVector[0]->clone();
-      /*g_meshVector.push_back (g_meshVector[0]->clone ());
-      g_meshVector[g_meshVector.size () - 1]->setPosition (
-	  g_meshVector[g_meshVector.size () - 2]->getPosition ().x - .4,
-	  g_meshVector[g_meshVector.size () - 2]->getPosition ().y + .4,
-	  g_meshVector[g_meshVector.size () - 2]->getPosition ().z);
-    	*/
+	  auto* mesh = g_scene.getActive()->clone();
+	  mesh->moveRight(2);
+      g_scene.insertMesh(mesh);
     }
   if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
     {
-      //delete g_meshVector[g_meshVector.size () - 1];
-      //g_meshVector.pop_back ();
+	  g_scene.removeMesh(g_scene.getActiveName());
     }
   if (key == GLFW_KEY_P && action == GLFW_PRESS)
     {
@@ -449,7 +431,10 @@ processMouseButton (GLFWwindow* window, int button, int action, int modifiers)
 void
 processScrollWheel(GLFWwindow* window, double xoff, double yoff){
   float newFov = glm::radians(-yoff * 2) + g_cam.getVerticalFov();
-  g_cam.setVerticalFov (newFov);
+  auto degrees = glm::degrees(newFov);
+  degrees = (degrees > 120) ? 120 : degrees;
+  degrees = (degrees < 1) ? 1 : degrees;
+  g_cam.setVerticalFov (glm::radians(degrees));
   g_cam.createProjectionMatrix (g_shaderProgram);
 }
 /******************************************************************/

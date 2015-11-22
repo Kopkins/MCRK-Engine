@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "VertexBuffer.h"
 #include "Light.cpp"
+#include "Camera.h"
 
 using Geometry = std::shared_ptr<VertexBuffer>;
 
@@ -22,24 +23,39 @@ public:
 	Mesh*
 	getActive();
 
+	std::string
+	getActiveName();
+
 	void
 	setLight(Light light);
 
 	void
-	createMesh(std::string name);
+	insertMesh(Mesh* mesh);
+
+	void
+	removeMesh(std::string name);
 
 	void
 	createMesh(std::string name, std::string geomFile,
 			std::string tex, Material material,
 			ShaderProgram* shader);
 
-	const Light& getLight() const;
+	const Light&
+	getLight() const;
 
-	void setLight(const Light& light);
+	void
+	setLight(const Light& light);
+
+	void
+	draw(Camera cam);
+
+	int
+	size();
 
 private:
 	std::set<std::string> m_names;
 	std::string m_active;
 	std::unordered_map<std::string, Mesh*> m_meshs;
 	Light m_light;
+	int m_size;
 };

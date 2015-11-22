@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 Scene::Scene() :
-		m_names(), m_active(), m_meshs() {
+		m_names(), m_active(), m_meshs(), m_size(0) {
 }
 
 void
@@ -20,14 +20,35 @@ Scene::getActive() {
 	return m_meshs.at(m_active);
 }
 
+std::string
+Scene::getActiveName() {
+	return m_active;
+}
+
 void
 Scene::setLight(Light light){
 	m_light = light;
 }
 
 void
-Scene::createMesh(std::string name) {
-	m_meshs.insert({name, new Mesh});
+Scene::insertMesh(Mesh* mesh) {
+	std::string name = "mesh" + std::to_string(m_size);
+	m_meshs.insert({name, mesh});
+	m_names.insert(name);
+	m_active = name;
+	m_size++;
+}
+
+void
+Scene::removeMesh(std::string name) {
+	m_size--;
+	if (!m_size) {
+		std::cout << "No more Mesh in Scene. Exiting" << std::endl;
+		exit(-1);
+	}
+	m_meshs.erase(name);
+	m_names.erase(name);
+	m_active = *(--m_names.end());
 }
 
 void
@@ -46,12 +67,30 @@ Scene::createMesh(std::string name, std::string geomFile,
 	m_meshs.insert({name, mesh});
 	m_names.insert(name);
 	m_active = name;
+	m_size++;
 }
 
-const Light& Scene::getLight() const {
+const Light&
+Scene::getLight() const {
 	return m_light;
 }
 
-void Scene::setLight(const Light& light) {
+void
+Scene::setLight(const Light& light) {
 	m_light = light;
+}
+
+void
+Scene::draw(Camera cam) {
+	float camTransform[16];
+	cam.getTransform(camTransform);
+	for (auto mesh : m_names) {
+		m_meshs.at(mesh)->createModelViewMatrix(camTransform);
+		m_meshs.at(mesh)->draw();
+	}
+}
+
+int
+Scene::size() {
+	return m_size;
 }

@@ -6,7 +6,7 @@ in vec2 vTexCoordOut;
 out vec4 fColor;
 
 uniform sampler2D fSampler;
-uniform float colorWeight = 0.20;
+uniform float colorWeight = 0.0;
 
 void
 main ()

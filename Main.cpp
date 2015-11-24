@@ -44,6 +44,9 @@ KeyBuffer g_keybuffer;
 bool g_isWire;
 MouseHandler g_mouse;
 Scene g_scene;
+std::vector<Material*> g_materials;
+int g_matIdx = 0;
+float g_cWeight = 0.0f;
 /******************************************************************/
 
 void
@@ -233,16 +236,32 @@ initScene ()
 {
   initShaders ();
   initCamera ();
-  Material mat(Vector3(0.1, 0.1, 0.2),Vector3(0.75,0.75,0.8),Vector3(0.75,0.75,0.8),128.0f);
-  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", mat, &g_shaderProgram);
-  g_scene.createMesh("first", "Sphere.obj", "EarthBath.png", mat, &g_shaderProgram);
-  //g_meshVector.push_back (new Mesh);
-  //std::vector<float> print = *sphere;
-  //g_meshVector[0]->addGeometry (sphere);
-  //g_meshVector[0]->setShaderPointer(&g_shaderProgram);
-  //g_meshVector[0]->loadTexture ("EarthBath.png");
-  //g_meshVector[0]->activateMaterial();
-  //g_meshVector[0]->prepareVao ();
+  Material*mat = new Material (
+    // So Shiny, So Chrome
+    { 0.1, 0.1, 0.1 },{ 0.5, 0.5, 0.5 },{ 0.87, 0.87, 0.87 },98.8f);
+  g_materials.push_back (mat);
+  mat = new Material (
+    // Green Plastic
+    { 0.0, 0.0, 0.0 },{ 0.1, 0.35, 0.1 },{ 0.45, 0.45, 0.55 },57.6f);
+  g_materials.push_back (mat);
+  mat = new Material (
+      // white rubber
+    { 0.05, 0.05, 0.05 },{ 0.5, 0.5, 0.5 },{ 0.7, 0.7, 0.7 },10.0);
+  g_materials.push_back (mat);
+  mat = new Material (
+      //gold
+    { 0.24725, 0.1995, 0.0745 },{ 0.75164, 0.60648, 0.22648 },{ 0.628281, 0.555802, 0.366065 },51.2f);
+  g_materials.push_back (mat);
+  mat = new Material (
+    //emerald
+    { 0.0215, 0.1745, 0.0215 },{ 0.07568, 0.61424, 0.07568 },{ 0.633, 0.727811, 0.633 },1.0f);
+  g_materials.push_back (mat);
+
+  Light light (
+    { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 0.9, 0.8, 0.7 },{ 0, 1, 0 });
+  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
+  g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
+  g_scene.setLight (light, g_shaderProgram);
 
 }
 
@@ -275,7 +294,7 @@ void
 updateScene (double time)
 {
   const float MOVEMENT_DELTA = 5.0f * time;
-  const float ROTATION_DELTA = 1.0f * time;
+  const float ROTATION_DELTA = 0.5f * time;
   const float SCALESHEAR_DELTA = 1.1f;
   updateCamera (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA);
   updateMesh (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA, SCALESHEAR_DELTA);
@@ -352,8 +371,9 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
     }
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS)
     {
-	  auto* mesh = g_scene.getActive()->clone();
-	  mesh->moveRight(2);
+      g_scene.getActive()->setMaterial(*g_materials[0]);
+      auto* mesh = g_scene.getActive()->clone();
+      mesh->moveRight(2);
       g_scene.insertMesh(mesh);
     }
   if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
@@ -379,6 +399,26 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
 	  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	  g_isWire=true;
 	}
+    }
+  if (key == GLFW_KEY_M && action == GLFW_PRESS)
+    {
+      auto* mesh = g_scene.getActive();
+      if (g_matIdx == 4)
+	g_matIdx = 1;
+      else
+	++g_matIdx;
+      mesh->setMaterial(*(g_materials[g_matIdx]));
+      mesh->activateMaterial();
+    }
+  if (key == GLFW_KEY_B && action == GLFW_PRESS)
+    {
+      g_cWeight += 0.1f;
+      if (g_cWeight > 1.0f)
+	g_cWeight = 0.0f;
+      g_shaderProgram.enable();
+      GLint loc = g_shaderProgram.getUniformLocation("colorWeight");
+      g_shaderProgram.setUniform1f(loc, g_cWeight);
+      g_shaderProgram.disable();
     }
 
   g_keybuffer.setKey (key, action);

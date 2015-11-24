@@ -1,6 +1,4 @@
 #include "Mesh.h"
-#include "Texture.h"
-#include "Transform.h"
 
 #define BUFFER_OFFSET(byteOffset) (reinterpret_cast<void *> (byteOffset))
 
@@ -235,13 +233,15 @@ Mesh::setShaderPointer (ShaderProgram* shader)
 void
 Mesh::activateMaterial ()
 {
+  m_shader->enable();
   GLint materialLoc = m_shader->getUniformLocation ("material.ambientRefl");
   m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
   materialLoc = m_shader->getUniformLocation ("material.diffuseRefl");
-  m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
+  m_shader->setUniform3fv (materialLoc, 3, &m_material.diffuseRefl.x);
   materialLoc = m_shader->getUniformLocation ("material.specularRefl");
-  m_shader->setUniform3fv (materialLoc, 3, &m_material.ambientRefl.x);
+  m_shader->setUniform3fv (materialLoc, 3, &m_material.specularRefl.x);
   materialLoc = m_shader->getUniformLocation ("material.shininess");
   m_shader->setUniform1f (materialLoc, m_material.shininess);
+  m_shader->disable();
 }
 

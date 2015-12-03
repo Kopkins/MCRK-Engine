@@ -21,12 +21,11 @@ struct Light
   vec3 direction;
 };
 
-//uniform Light light;
-
 uniform Light light = Light (vec3 (0.2, 0.1, 0.6),
                              vec3 (0.1, 0.5, 0.7),
 			     vec3 (0.1, 0.5, 0.7), 
 			     vec3 (0, 0, 1));
+
 
 struct Material
 {
@@ -37,11 +36,11 @@ struct Material
   float shininess;
 };
 
-//uniform Material material;
 
 uniform Material material = Material (vec3 (0.1, 0.1, 0.2), 
         	                      vec3 (0.75, 0.75, 0.8),
                  		      vec3 (0.75, 0.75, 0.8), 16.0);
+
 
 void
 main ()

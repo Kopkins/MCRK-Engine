@@ -258,7 +258,7 @@ initScene ()
   g_materials.push_back (mat);
 
   Light light (
-    { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 0.9, 0.8, 0.7 },{ 0, 1, 0 });
+    { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{ 0, 0, 1 });
   //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
   g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
   g_scene.setLight (light, g_shaderProgram);
@@ -415,6 +415,7 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
       g_cWeight += 0.1f;
       if (g_cWeight > 1.0f)
 	g_cWeight = 0.0f;
+
       g_shaderProgram.enable();
       GLint loc = g_shaderProgram.getUniformLocation("colorWeight");
       g_shaderProgram.setUniform1f(loc, g_cWeight);

@@ -75,13 +75,13 @@ Scene::setLight(const Light& light, ShaderProgram& shader) {
   m_light = light;
   shader.enable();
   GLint lightLoc = shader.getUniformLocation ("light.ambient");
-  shader.setUniform3fv (lightLoc, 3, &m_light.ambient.x);
+  shader.setUniform3fv (lightLoc, 1, &m_light.ambient.x);
   lightLoc = shader.getUniformLocation ("light.diffuse");
-  shader.setUniform3fv (lightLoc, 3, &m_light.diffuse.x);
+  shader.setUniform3fv (lightLoc, 1, &m_light.diffuse.x);
   lightLoc = shader.getUniformLocation ("light.specular");
-  shader.setUniform3fv (lightLoc, 3, &m_light.specular.x);
+  shader.setUniform3fv (lightLoc, 1, &m_light.specular.x);
   lightLoc = shader.getUniformLocation ("light.direction");
-  shader.setUniform3fv (lightLoc, 3, &m_light.direction.x);
+  shader.setUniform3fv (lightLoc, 1, &m_light.direction.x);
   shader.disable();
 }
 
@@ -92,7 +92,6 @@ Scene::draw(Camera cam) {
   for (auto name : m_names) {
     auto* mesh = m_meshs.at(name);
     mesh->createModelViewMatrix(camTransform);
-    mesh->activateMaterial();
     mesh->draw();
   }
 }

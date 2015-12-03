@@ -254,7 +254,7 @@ initScene ()
   g_materials.push_back (mat);
   mat = new Material (
     //emerald
-    { 0.0215, 0.1745, 0.0215 },{ 0.07568, 0.61424, 0.07568 },{ 0.633, 0.727811, 0.633 },1.0f);
+    { 0.0215, 0.1745, 0.0215 },{ 0.07568, 0.61424, 0.07568 },{ 0.633, 0.727811, 0.633 },84.0f);
   g_materials.push_back (mat);
 
   Light light (
@@ -297,7 +297,7 @@ updateScene (double time)
   const float ROTATION_DELTA = 0.5f * time;
   const float SCALESHEAR_DELTA = 1.1f;
   updateCamera (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA);
-  updateMesh (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA, SCALESHEAR_DELTA);
+  g_scene.getActive()->update (g_keybuffer, MOVEMENT_DELTA);
 }
 
 /******************************************************************/

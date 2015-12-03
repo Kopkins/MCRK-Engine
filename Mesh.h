@@ -7,6 +7,7 @@
 #include "Transform.h"
 #include "Texture.h"
 #include "VertexBuffer.h"
+#include "KeyBuffer.h"
 #include "Material.cpp"
 
 class Mesh{
@@ -114,6 +115,15 @@ public:
 
   void
   activateMaterial ();
+
+  void
+  yawPitchRoll(Vector3& v);
+
+  void
+  move (Vector3& v);
+
+  void
+  update (KeyBuffer keyBuffer, const float MOVEMENT_DELTA);
 
 private:
 

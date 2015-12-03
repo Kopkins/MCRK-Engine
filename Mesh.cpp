@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "Mesh.h"
 
 #define BUFFER_OFFSET(byteOffset) (reinterpret_cast<void *> (byteOffset))
@@ -243,5 +244,61 @@ Mesh::activateMaterial ()
   materialLoc = m_shader->getUniformLocation ("material.shininess");
   m_shader->setUniform1f (materialLoc, m_material.shininess);
   m_shader->disable();
+}
+
+void
+Mesh::yawPitchRoll(Vector3& v)
+{
+  yaw(v.x);
+  pitch(v.y);
+  roll(v.z);
+}
+
+void
+Mesh::move (Vector3& v)
+{
+  moveRight(v.x);
+  moveUp(v.y);
+  moveBack(v.z);
+}
+
+void
+Mesh::update (KeyBuffer keyBuffer, const float MOVEMENT_DELTA)
+{
+  Vector3 dxyz(0), dypr(0);
+  auto buf = keyBuffer.getBuffer ();
+  if (buf[GLFW_KEY_5])
+    {
+      alignWithWorldY();
+      return;
+    }
+  if (buf[GLFW_KEY_6])
+    {
+      scaleLocal (1.01f);
+      return;
+    }
+
+  if (buf[GLFW_KEY_7])
+    {
+      scaleWorld (0.99f);
+      return;
+    }
+  dxyz.x = buf[GLFW_KEY_RIGHT] - buf[GLFW_KEY_LEFT];
+  dxyz.y = buf[GLFW_KEY_PAGE_UP] - buf[GLFW_KEY_PAGE_DOWN];
+  dxyz.z = buf[GLFW_KEY_DOWN] - buf[GLFW_KEY_UP];
+  dypr.y = buf[GLFW_KEY_2];
+  dypr.x = buf[GLFW_KEY_3];
+  dypr.z = buf[GLFW_KEY_4];
+  dxyz *= MOVEMENT_DELTA;
+  dypr *= MOVEMENT_DELTA / 10;
+  move (dxyz);
+  yawPitchRoll (dypr);
+  float sxyz, syxz, szxy;
+  sxyz = buf[GLFW_KEY_8] * MOVEMENT_DELTA / 10;
+  syxz = buf[GLFW_KEY_9] * MOVEMENT_DELTA / 10;
+  szxy = buf[GLFW_KEY_0] * MOVEMENT_DELTA / 10;
+  shearLocalXByYz(sxyz, sxyz);
+  shearLocalYByXz(syxz, syxz);
+  shearLocalZByXy(szxy, szxy);
 }
 

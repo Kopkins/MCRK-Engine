@@ -243,7 +243,6 @@ Mesh::activateMaterial ()
   m_shader->setUniform3fv (materialLoc, 1	, &m_material.specularRefl.x);
   materialLoc = m_shader->getUniformLocation ("material.shininess");
   m_shader->setUniform1f (materialLoc, m_material.shininess);
-  std::cout<<m_material.shininess<<"\n";
   m_shader->disable();
 }
 

@@ -1,7 +1,7 @@
 #version 330
 
 in vec3 vOutColor;
-in vec2 vTexCoordOut;
+in vec2 vTexCoord;
 
 out vec4 fColor;
 

@@ -16,7 +16,7 @@ struct Light
   // These are ambient and diffuse light intensities
   vec3 ambient;
   vec3 diffuse;
-  vec3 specular;
+  vec3 specular;void
   // Points toward the light source (which is infinitely far away)
   vec3 direction;
 };
@@ -58,7 +58,7 @@ main ()
   vec3 normalEye = normalize (normalMatrix * vNormal);
   float diffuseCoeff = dot (normalEye, normalize (light.direction));
   // It will be negative if the light is shining on the back side
-  diffuseCoeff = max (diffuseCoeff, 0.0);
+  diffuseCoeff = max (diffuseCoeff, 0.0);vTex
   vec3 diffuseColor = diffuseCoeff * light.diffuse * material.diffuseRefl;
 
   // Specular lighting

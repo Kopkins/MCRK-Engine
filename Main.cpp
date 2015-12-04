@@ -283,8 +283,8 @@ void
 initShaders ()
 {
   g_shaderProgram.createProgramId ();
-  g_shaderProgram.createVertexShader ("Vec3NormTexPhong.vert");
-  g_shaderProgram.createFragmentShader ("Vec3TexMix.frag");
+  g_shaderProgram.createVertexShader ("Vec3Tex.vert");
+  g_shaderProgram.createFragmentShader ("Vec3NormTexPhong.frag");
   g_shaderProgram.link ();
 }
 

@@ -26,9 +26,6 @@ AiScene::readVertexData (unsigned meshNum) const
 {
   const aiMesh* mesh = m_scene->mMeshes[meshNum];
   std::shared_ptr<VertexBuffer> collection (new VertexBuffer);
-  std::vector<float> vertices;
-  std::vector<int> indices;
-  int lastIndex = 0;
   
   for (unsigned faceNum = 0; faceNum < mesh->mNumFaces; ++faceNum)
   {
@@ -39,41 +36,19 @@ AiScene::readVertexData (unsigned meshNum) const
       auto vertexNum = face.mIndices[indexNum];
 
       aiVector3D position = mesh->mVertices[vertexNum];
-      aiVector3D normal = mesh->mNormals[vertexNum];
-      aiVector3D texture = mesh->mTextureCoords[0][vertexNum];
-      float vertex [] = {
-	position.x,
-	position.y,
-	position.z,
-	normal.x,
-	normal.y,
-	normal.z,
-	texture.x,
-	texture.y};
+      collection->addFloat(position.x);
+      collection->addFloat(position.y);
+      collection->addFloat(position.z);
 
-      int index = -1;
-      for (size_t i = 0; i < vertices.size(); ++i)
-	{
-	  if (vertex[0] == vertices[i])
-	    {
-	      for (int j = 1; j < 7; ++j)
-		{
-		  if (vertex[j] != vertices[i + j])
-		    break;
-		  index = i / 7;
-		}
-	    }
-	  if (index != -1)
-	    break;
-	}
-      if (index == -1) {
-	for (auto f : vertex) {vertices.push_back(f);}
-	indices.push_back(lastIndex);
-	++lastIndex;
-      }
-      else {
-	  indices.push_back(index);
-      }
+      aiVector3D normal = mesh->mNormals[vertexNum];
+      collection->addFloat(normal.x);
+      collection->addFloat(normal.y);
+      collection->addFloat(normal.z);
+
+      aiVector3D texture = mesh->mTextureCoords[0][vertexNum];
+      collection->addFloat(texture.x);
+      collection->addFloat(texture.y);
+
 
     }
   }

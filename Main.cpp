@@ -190,7 +190,7 @@ initWindow (GLFWwindow*& window)
   // Enable depth testing so we don't draw occluded surfaces
   glEnable (GL_DEPTH_TEST);
   // Cull back-facing triangles
-  //glEnable (GL_CULL_FACE);
+  glEnable (GL_CULL_FACE);
   // Set initial viewport size
   int width, height;
   glfwGetFramebufferSize (window, &width, &height);
@@ -254,14 +254,14 @@ initScene ()
   g_materials.push_back (mat);
   mat = new Material (
     //emerald
-    { 0.0215, 0.1745, 0.0215 },{ 0.07568, 0.61424, 0.07568 },{ 0.633, 0.727811, 0.633 },84.0f);
+    { 0, 0, 0 },{ 0.5, 0.5, 0.5 },{ 0.5, 0.5,0.5 },84.0f);
   g_materials.push_back (mat);
 
   Light light (
-    { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{ 0, 0, 1 });
+    { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
   //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
   g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
-  g_scene.setLight (light, g_shaderProgram);
+  //g_scene.setLight (light, g_shaderProgram);
 
 }
 
@@ -295,7 +295,6 @@ updateScene (double time)
 {
   const float MOVEMENT_DELTA = 5.0f * time;
   const float ROTATION_DELTA = 0.5f * time;
-  const float SCALESHEAR_DELTA = 1.1f;
   updateCamera (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA);
   g_scene.getActive()->update (g_keybuffer, MOVEMENT_DELTA);
 }

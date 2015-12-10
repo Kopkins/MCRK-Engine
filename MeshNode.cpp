@@ -13,12 +13,21 @@
 
 struct MeshNode {
 
-  MeshNode (Mesh *);
+  MeshNode (Mesh * mesh) : m_mesh(mesh) {}
 
-  ~MeshNode ();
+  ~MeshNode () {}
+
+  void
+  draw ()
+  {
+    m_mesh->draw ();
+    for (auto* mesh : m_children) {
+	mesh->draw ();
+    }
+  }
 
   Mesh * m_mesh;
-  std::vector<Mesh *> m_children;
+  std::vector<MeshNode *> m_children;
 };
 
 

@@ -28,6 +28,9 @@ public:
   std::vector<MeshNode *>&
   getChildren ();
 
+  void
+  addChild (const Mesh& mesh);
+
 private:
   MeshNode m_root;
 

@@ -49,11 +49,15 @@ Scene::removeMesh(std::string name) {
 
 void
 Scene::createMesh (std::string name, std::string geomFile, std::string tex,
-		   Material material, ShaderProgram& shader)
+		   Material material, ShaderProgram& shader, int index)
 {
   auto mesh = new Mesh;
   AiScene Model (geomFile);
-  mesh->addGeometry (Model.readVertexData (0));
+  std::shared_ptr<VertexBuffer> vBuf (new VertexBuffer);
+  std::shared_ptr<IndexBuffer> iBuf (new IndexBuffer);
+  Model.readBufferData (index, vBuf, iBuf);
+  mesh->addGeometry (vBuf);
+  mesh->addIndices (iBuf);
   mesh->loadTexture (tex);
   mesh->setShaderPointer (& shader);
   mesh->setMaterial (material);

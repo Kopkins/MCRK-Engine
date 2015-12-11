@@ -4,7 +4,8 @@
 #define BUFFER_OFFSET(byteOffset) (reinterpret_cast<void *> (byteOffset))
 
 Mesh::Mesh () :
-    m_vao (), m_transform (), m_tex (new Texture), m_material (), m_shader (
+    m_vao (), m_vertexBuffer(NULL), m_indexBuffer(NULL), m_transform (), m_tex (new Texture),
+    m_material (), m_shader (
 	nullptr)
 {
   glGenVertexArrays (1, &m_vao);
@@ -19,6 +20,12 @@ void
 Mesh::addGeometry (std::shared_ptr<VertexBuffer> newvertices)
 {
   m_vertexBuffer = newvertices;
+}
+
+void
+Mesh::addIndices (std::shared_ptr<IndexBuffer> indices)
+{
+  m_indexBuffer = indices;
 }
 
 void
@@ -44,7 +51,15 @@ Mesh::prepareVao ()
   glEnableVertexAttribArray (texAttrib);
   glVertexAttribPointer (texAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
 			 BUFFER_OFFSET(6 * sizeof(float)));
+
+  size = m_indexBuffer->size () * sizeof(unsigned int);
+  GLuint elementBuf;
+  glGenBuffers (1, &elementBuf);
+  glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, elementBuf);
+  glBufferData (GL_ELEMENT_ARRAY_BUFFER, size, m_indexBuffer->data (), GL_STATIC_DRAW);
+
   glBindVertexArray (0);
+
 }
 
 void
@@ -60,7 +75,7 @@ Mesh::draw ()
   glActiveTexture (GL_TEXTURE0);
   m_tex->bind ();
   glBindVertexArray (m_vao);
-  glDrawArrays (GL_TRIANGLES, 0, m_vertexBuffer->size () / 6);
+  glDrawElements (GL_TRIANGLES, m_indexBuffer->size (), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
   glBindVertexArray (0);
   m_tex->unbind ();
   m_shader->disable ();
@@ -243,7 +258,6 @@ Mesh::activateMaterial ()
   m_shader->setUniform3fv (materialLoc, 1	, &m_material.specularRefl.x);
   materialLoc = m_shader->getUniformLocation ("material.shininess");
   m_shader->setUniform1f (materialLoc, m_material.shininess);
-  std::cout<<m_material.shininess<<"\n";
   m_shader->disable();
 }
 

@@ -190,7 +190,7 @@ initWindow (GLFWwindow*& window)
   // Enable depth testing so we don't draw occluded surfaces
   glEnable (GL_DEPTH_TEST);
   // Cull back-facing triangles
-  //glEnable (GL_CULL_FACE);
+  glEnable (GL_CULL_FACE);
   // Set initial viewport size
   int width, height;
   glfwGetFramebufferSize (window, &width, &height);
@@ -254,14 +254,14 @@ initScene ()
   g_materials.push_back (mat);
   mat = new Material (
     //emerald
-    { 0.0215, 0.1745, 0.0215 },{ 0.07568, 0.61424, 0.07568 },{ 0.633, 0.727811, 0.633 },84.0f);
+    { 0, 0, 0 },{ 0.5, 0.5, 0.5 },{ 0.5, 0.5,0.5 },84.0f);
   g_materials.push_back (mat);
 
   Light light (
-    { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{ 0, 0, 1 });
-  //g_scene.createMesh("first", "nanosuit2.obj", "z.png", *mat, g_shaderProgram);
+    { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
+  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
   g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
-  g_scene.setLight (light, g_shaderProgram);
+  //g_scene.setLight (light, g_shaderProgram);
 
 }
 

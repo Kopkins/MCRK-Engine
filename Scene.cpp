@@ -78,9 +78,8 @@ void
 Scene::setLight(const Light& light, ShaderProgram& shader) {
   m_light = light;
   shader.enable();
-  GLint lightLoc = shader.getUniformLocation ("light.ambient");
-  shader.setUniform3fv (lightLoc, 1, &m_light.ambient.x);
-  lightLoc = shader.getUniformLocation ("light.diffuse");
+
+  GLint lightLoc = shader.getUniformLocation ("light.diffuse");
   shader.setUniform3fv (lightLoc, 1, &m_light.diffuse.x);
   lightLoc = shader.getUniformLocation ("light.specular");
   shader.setUniform3fv (lightLoc, 1, &m_light.specular.x);

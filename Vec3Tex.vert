@@ -17,6 +17,7 @@ main()
 
 vec4 eyePosition = vModelView * vec4 (vPosition, 1.0);
 gl_Position = vProjection * eyePosition;
+eyePosition = vModelView * vec4 (vPosition, 1.0);
 
   mat3 normalMatrix = mat3 (vModelView);
   // If non-uniform scaling is not used we can avoid the inverse transpose

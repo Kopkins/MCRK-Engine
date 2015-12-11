@@ -15,9 +15,6 @@ uniform vec3 emissiveIntensity;
 // Represents a directional light
 struct Light
 {
-  // 0 if directional, 1 if point, 2 if spot
-  int type;
-
   // These are light intensities
   vec3 diffuse;
   vec3 specular;
@@ -35,12 +32,19 @@ struct Light
 
 };
 
-uniform Light light = Light (2,vec3 (0.5, 0.5, 0.5),
+uniform Light light = Light (vec3 (0.9, 0.9, 0.9),
 			     vec3 (0.5, 0.5, 0.5), 
 			     vec3 (0,0,0),
                              vec3 (0,0,0),
                              vec3 (0, 0, -1),
-                             0.99, 15.0);
+                             0.999, 15.0);
+
+uniform Light dlight = Light(vec3(0.5,0.5,0.5),
+			     vec3(0.5,0.5,0.5),
+			     vec3(0,0,0),
+			     vec3(0,0,0),
+			     vec3(0,0,1),
+			     0.0,0.0);
 
 struct Material
 {
@@ -57,24 +61,15 @@ uniform Material material = Material (vec3 (1,1,1),
                  		      vec3 (1, 1, 1), 222.0);
 
 
-vec3 calculateLighting (Light light, Material material, vec3 vertexPosition, vec3 vertexNormal);
-
 void
 main()
 {
-    
-    //vec3 baseColor=material.ambientRefl*ambientIntensity*emissiveIntensity;
-    //vec3 baseColor=vec3(1,1,1);
-
 
   vec3 normal=vNormalEyeOut;
-  vec3 fragPos=vec3(vPositionEyeOut);
-  
- // for (int i=0; i<1; ++i)
- // {
- //   baseColor+=calculateLighting (light, material, fragPos ,normal);
- // }
+  vec3 fragPos=vec3(vPositionEyeOut);  
 
+
+    //spotlight calculations
     vec3 lightVec = normalize( light.position - fragPos);
     float brightness = dot (normal, lightVec);
     brightness = max(brightness,0.0);
@@ -83,12 +78,19 @@ main()
     vec3 specular = vec3(0.0);
     float spot = 1.0;
     if (brightness > 0.0){
+
       vec3 reflectVec = reflect(-lightVec, normal);
       vec3 viewVec = normalize(-fragPos.xyz);
       float spec = dot (reflectVec, viewVec);
       spec = max(spec, 0.0);
       spec = pow (spec, material.specularPower);
       specular = spec * light.specular * material.specularRefl;
+
+      //Non-directional, so light attenuates
+      float distance = length (fragPos - light.position);
+      float attenuation = 1.0 / ( light.attenuationCoefficients.x * distance
+          		  + light.attenuationCoefficients.y * distance
+         		  + light.attenuationCoefficients.z * distance);
 
       vec3 spotDir = normalize (light.direction);
       spot =  dot(-lightVec, spotDir);
@@ -98,18 +100,32 @@ main()
       spot = pow (spot, light.falloff);
     }
 
-      vec3 baseColor = spot*(diffuse+specular);
-      baseColor = clamp (baseColor,0.0,1.0);
-      
-      vec4 textureColor = texture(fSampler, vTexCoordOut);
-      fragColor = mix (textureColor, vec4(baseColor,1.0), colorWeight);
-      
+    //direction light calculations
+    //lightVec = normalize (-light.direction);
+    //brightness = dot (normal, lightVec);
+    //brightness = max(brightness, 0.0);
+    //diffuse = brightness * light.diffuse * material.diffuseRefl;
 
-    //vec4 lightColor=vec4(baseColor,1);
-    //lightColor=clamp(fragColor, 0.0, 1.0);
-    //vec4 textureColor = texture(fSampler, vTexCoordOut);
-    //fragColor = mix(textureColor, lightColor, colorWeight);
-    //fragColor=lightColor;
+    //specular = vec3(0.0);
+    //if (brightness > 0.0){
+    //  vec3 specularColor = material.specularRefl * dlight.specular;
+    //  vec3 reflectVec = reflect (lightVec, normal);
+    //  vec3 viewVec = normalize(-fragPos.xyz);
+    //  float spec = dot (reflectVec, viewVec);
+    //  spec = max( spec, 0.0);
+    //  spec = pow ( spec, material.specularPower);
+    //  specular = spec * light.specular * material.specularRefl;
+
+    //}
+
+
+    vec3 tex = vec3(texture(fSampler, vTexCoordOut));
+    diffuse = brightness * tex * light.diffuse;
+    vec3 baseColor = spot*(diffuse+specular);
+    baseColor = clamp (baseColor,0.0,1.0);
+    fragColor = vec4(baseColor,1.0);
+    fragColor = fragColor + mix(vec4(tex,1.0),vec4(0.1,0.1,0.1,1),.8);
+            
 }
 
 

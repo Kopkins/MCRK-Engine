@@ -1,12 +1,14 @@
 #include <assimp/postprocess.h>
 
 #include "AiScene.h"
-#include "VertexBuffer.h"
 
 AiScene::AiScene (const std::string& fileName)
 {
   m_scene = m_importer.ReadFile (fileName,
-		 aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_GenUVCoords);
+		 aiProcess_Triangulate |
+		 aiProcess_GenSmoothNormals |
+		 aiProcess_GenUVCoords |
+		 aiProcess_JoinIdenticalVertices);
   if (!m_scene)
   {
     auto error = m_importer.GetErrorString ();
@@ -21,37 +23,35 @@ AiScene::~AiScene ()
 
 }
 
-std::shared_ptr<VertexBuffer>
-AiScene::readVertexData (unsigned meshNum) const
+void
+AiScene::readBufferData (unsigned meshNum, std::shared_ptr<VertexBuffer> vertices,
+			 std::shared_ptr<IndexBuffer> indices) const
 {
   const aiMesh* mesh = m_scene->mMeshes[meshNum];
-  std::shared_ptr<VertexBuffer> collection (new VertexBuffer);
   
   for (unsigned faceNum = 0; faceNum < mesh->mNumFaces; ++faceNum)
   {
     const aiFace& face = mesh->mFaces[faceNum];
-    const unsigned INDICES_PER_FACE = 3;
-    for (unsigned indexNum = 0; indexNum < INDICES_PER_FACE; ++indexNum)
+    for (unsigned indexNum = 0; indexNum < 3; ++indexNum)
     {
-      auto vertexNum = face.mIndices[indexNum];
-
-      aiVector3D position = mesh->mVertices[vertexNum];
-      collection->addFloat(position.x);
-      collection->addFloat(position.y);
-      collection->addFloat(position.z);
-
-      aiVector3D normal = mesh->mNormals[vertexNum];
-      collection->addFloat(normal.x);
-      collection->addFloat(normal.y);
-      collection->addFloat(normal.z);
-
-      aiVector3D texture = mesh->mTextureCoords[0][vertexNum];
-      collection->addFloat(texture.x);
-      collection->addFloat(texture.y);
-
-
+      indices->add(face.mIndices[indexNum]);
     }
   }
-  return collection;
+  for (unsigned vertNum = 0; vertNum < mesh->mNumVertices; ++vertNum)
+    {
+      aiVector3D position = mesh->mVertices[vertNum];
+      vertices->addFloat(position.x);
+      vertices->addFloat(position.y);
+      vertices->addFloat(position.z);
+
+      aiVector3D normal = mesh->mNormals[vertNum];
+      vertices->addFloat(normal.x);
+      vertices->addFloat(normal.y);
+      vertices->addFloat(normal.z);
+
+      aiVector3D texture = mesh->mTextureCoords[0][vertNum];
+      vertices->addFloat(texture.x);
+      vertices->addFloat(texture.y);
+    }
 }
 

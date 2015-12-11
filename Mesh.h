@@ -9,6 +9,7 @@
 #include "VertexBuffer.h"
 #include "KeyBuffer.h"
 #include "Material.cpp"
+#include "IndexBuffer.h"
 
 class Mesh{
   
@@ -20,8 +21,10 @@ public:
 
   Mesh(const std::vector<float>& vertices);
 
-  void addGeometry (std::shared_ptr<VertexBuffer> newm_vertices);
+  void addGeometry (std::shared_ptr<VertexBuffer> newvertices);
   
+  void addIndices (std::shared_ptr<IndexBuffer> indices);
+
   void outputGeometry();
 
   void prepareVao();
@@ -129,6 +132,7 @@ private:
 
   GLuint m_vao;
   std::shared_ptr<VertexBuffer> m_vertexBuffer;
+  std::shared_ptr<IndexBuffer> m_indexBuffer;
   Math::Transform m_transform;
   std::shared_ptr<Texture> m_tex;
   Material m_material;

@@ -259,7 +259,7 @@ initScene ()
 
   Light light (
     { 0.0, 0.0, 0.0 },{ 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{ 0, 0, 1 });
-  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
+  //g_scene.createMesh("first", "nanosuit2.obj", "z.png", *mat, g_shaderProgram);
   g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
   g_scene.setLight (light, g_shaderProgram);
 
@@ -295,7 +295,6 @@ updateScene (double time)
 {
   const float MOVEMENT_DELTA = 5.0f * time;
   const float ROTATION_DELTA = 0.5f * time;
-  const float SCALESHEAR_DELTA = 1.1f;
   updateCamera (g_keybuffer, MOVEMENT_DELTA, ROTATION_DELTA);
   g_scene.getActive()->update (g_keybuffer, MOVEMENT_DELTA);
 }

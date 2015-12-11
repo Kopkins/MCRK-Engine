@@ -8,6 +8,7 @@
 #include <assimp/Importer.hpp>
 
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 // Make sure you add "-lassimp" to your Makefile!
 
@@ -19,8 +20,9 @@ public:
 
   ~AiScene ();
 
-  std::shared_ptr<VertexBuffer>
-  readVertexData (unsigned meshNum) const;
+  void
+  readBufferData (unsigned meshNum, std::shared_ptr<VertexBuffer> vertices,
+			 std::shared_ptr<IndexBuffer> indices) const;
 
 private:
   // Importer dtor destroys the scene!

@@ -3,7 +3,7 @@
 
 #include <GL/glew.h>
 
-class VertexBuffer{
+class VertexBuffer {
 
 public:
 

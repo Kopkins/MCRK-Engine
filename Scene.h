@@ -5,6 +5,7 @@
 #include "AiScene.h"
 #include "Mesh.h"
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "Light.cpp"
 #include "Camera.h"
 #include "ShaderProgram.h"
@@ -36,7 +37,7 @@ public:
 
   void
   createMesh (std::string name, std::string geomFile, std::string tex,
-	      Material material, ShaderProgram& shader);
+	      Material material, ShaderProgram& shader, int index=0);
 
   const Light&
   getLight () const;

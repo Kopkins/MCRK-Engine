@@ -8,7 +8,8 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include "MeshNode.cpp"
+#include <vector>
+#include <string>
 #include "Mesh.h"
 
 class Model {
@@ -17,22 +18,15 @@ public:
 
   ~Model ();
 
-  Model (const MeshNode node);
 
   void
   draw ();
 
   void
-  setRoot (const MeshNode node);
-
-  std::vector<MeshNode *>&
-  getChildren ();
-
-  void
-  addChild (const Mesh& mesh);
+  addMesh (const Mesh& mesh);
 
 private:
-  MeshNode m_root;
+  std::vector<Mesh *> m_meshes;
 
 };
 

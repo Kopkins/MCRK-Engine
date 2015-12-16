@@ -58,7 +58,8 @@ Scene::createMesh (std::string name, std::string geomFile, std::string tex,
   Model.readBufferData (index, vBuf, iBuf);
   mesh->addGeometry (vBuf);
   mesh->addIndices (iBuf);
-  mesh->loadTexture (tex);
+  mesh->loadTexture (0,tex);
+  mesh->loadTexture(1,"sh3_s.jpg");
   mesh->setShaderPointer (& shader);
   mesh->setMaterial (material);
   mesh->activateMaterial ();

@@ -29,7 +29,7 @@ public:
 
   void prepareVao();
   
-  void loadTexture(std::string file);
+  void loadTexture(int type, std::string file);
 
   void draw();
 
@@ -134,7 +134,8 @@ private:
   std::shared_ptr<VertexBuffer> m_vertexBuffer;
   std::shared_ptr<IndexBuffer> m_indexBuffer;
   Math::Transform m_transform;
-  std::shared_ptr<Texture> m_tex;
+  std::shared_ptr<Texture> m_dif;
+  std::shared_ptr<Texture> m_spec;
   Material m_material;
   ShaderProgram* m_shader;
 

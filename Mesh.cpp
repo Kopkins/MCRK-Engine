@@ -4,7 +4,7 @@
 #define BUFFER_OFFSET(byteOffset) (reinterpret_cast<void *> (byteOffset))
 
 Mesh::Mesh () :
-    m_vao (), m_vertexBuffer(NULL), m_indexBuffer(NULL), m_transform (), m_tex (new Texture),
+    m_vao (), m_vertexBuffer(NULL), m_indexBuffer(NULL), m_transform (), m_dif (new Texture), m_spec(new Texture),
     m_material (), m_shader (
 	nullptr)
 {
@@ -63,9 +63,12 @@ Mesh::prepareVao ()
 }
 
 void
-Mesh::loadTexture (std::string file)
+Mesh::loadTexture (int type, std::string file)
 {
-  m_tex->setData (file);
+  if (type==0)
+    m_dif->setData (file);
+  else
+    m_spec->setData(file);
 }
 
 void
@@ -73,11 +76,14 @@ Mesh::draw ()
 {
   m_shader->enable ();
   glActiveTexture (GL_TEXTURE0);
-  m_tex->bind ();
+  m_dif->bind ();
+  glActiveTexture (GL_TEXTURE1);
+  m_spec->bind();
   glBindVertexArray (m_vao);
   glDrawElements (GL_TRIANGLES, m_indexBuffer->size (), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
   glBindVertexArray (0);
-  m_tex->unbind ();
+  m_spec->unbind ();
+  m_dif->unbind ();
   m_shader->disable ();
 }
 
@@ -219,7 +225,8 @@ Mesh*
 Mesh::clone ()
 {
   Mesh* ret = new Mesh;
-  ret->m_tex = m_tex;
+  ret->m_dif = m_dif;
+  ret->m_spec = m_spec;
   ret->m_transform = m_transform;
   ret->m_vao = m_vao;
   ret->m_vertexBuffer = m_vertexBuffer;
@@ -280,12 +287,13 @@ Mesh::move (Vector3& v)
 void
 Mesh::update (KeyBuffer keyBuffer, const float MOVEMENT_DELTA)
 {
+
   Vector3 dxyz(0), dypr(0);
   auto buf = keyBuffer.getBuffer ();
   if (buf[GLFW_KEY_5])
     {
       alignWithWorldY();
-      return;
+     return;
     }
   if (buf[GLFW_KEY_6])
     {
@@ -302,7 +310,7 @@ Mesh::update (KeyBuffer keyBuffer, const float MOVEMENT_DELTA)
   dxyz.y = buf[GLFW_KEY_PAGE_UP] - buf[GLFW_KEY_PAGE_DOWN];
   dxyz.z = buf[GLFW_KEY_DOWN] - buf[GLFW_KEY_UP];
   dypr.y = buf[GLFW_KEY_2];
-  dypr.x = buf[GLFW_KEY_3];
+  dypr.x = -3;
   dypr.z = buf[GLFW_KEY_4];
   dxyz *= MOVEMENT_DELTA;
   dypr *= MOVEMENT_DELTA / 10;

@@ -259,8 +259,9 @@ initScene ()
 
   Light light (
     { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
-  //g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
-  g_scene.createMesh ("first", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
+
+  g_scene.createMesh("second", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
+  g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
   //g_scene.setLight (light, g_shaderProgram);
 
 }
@@ -327,8 +328,7 @@ updateMesh (KeyBuffer keybuffer, float moveDelta, float rotateDelta,
       buffer[GLFW_KEY_1] * moveDelta);
   mesh->pitch (
       buffer[GLFW_KEY_2] * rotateDelta);
-  mesh->yaw (
-      buffer[GLFW_KEY_3] * rotateDelta);
+  mesh->yaw ( buffer[GLFW_KEY_3] * rotateDelta);
   mesh->roll (
       buffer[GLFW_KEY_4] * rotateDelta);
   if (buffer[GLFW_KEY_5])
@@ -339,10 +339,10 @@ updateMesh (KeyBuffer keybuffer, float moveDelta, float rotateDelta,
     mesh->scaleWorld (shearDelta);
   mesh->shearLocalXByYz (
       buffer[GLFW_KEY_8] * shearDelta, buffer[GLFW_KEY_8] * shearDelta);
-  mesh->shearLocalYByXz (
-      buffer[GLFW_KEY_9] * shearDelta, buffer[GLFW_KEY_9] * shearDelta);
-  mesh->shearLocalZByXy (
-      buffer[GLFW_KEY_0] * shearDelta, buffer[GLFW_KEY_0] * shearDelta);
+  //mesh->shearLocalYByXz (
+  //    buffer[GLFW_KEY_9] * shearDelta, buffer[GLFW_KEY_9] * shearDelta);
+  //mesh->shearLocalZByXy (
+  //    buffer[GLFW_KEY_0] * shearDelta, buffer[GLFW_KEY_0] * shearDelta);
 }
 
 /******************************************************************/
@@ -402,7 +402,7 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
   if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
       auto* mesh = g_scene.getActive();
-      if (g_matIdx == 4)
+      if (g_matIdx == 4)s
 	g_matIdx = 1;
       else
 	++g_matIdx;
@@ -420,6 +420,10 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
       g_shaderProgram.setUniform1f(loc, g_cWeight);
       g_shaderProgram.disable();
     }
+  if(key==GLFW_KEY_U && action==GLFW_PRESS)
+    g_scene.getMesh("second")->loadTexture(0,"WebsterBath.png");
+  if (key==GLFW_KEY_Y && action==GLFW_PRESS)
+    g_scene.getMesh("second")->loadTexture(0,"EarthBath.png");
 
   g_keybuffer.setKey (key, action);
 }

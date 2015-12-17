@@ -402,7 +402,7 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
   if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
       auto* mesh = g_scene.getActive();
-      if (g_matIdx == 4)s
+      if (g_matIdx == 4)
 	g_matIdx = 1;
       else
 	++g_matIdx;

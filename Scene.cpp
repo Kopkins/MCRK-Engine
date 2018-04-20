@@ -93,10 +93,10 @@ void
 Scene::draw(Camera cam) {
   float camTransform[16];
   cam.getTransform(camTransform);
-  for (auto name : m_meshes) {
-    std::cout << to_string(name);
-    //mesh->createModelViewMatrix(camTransform);
-    //mesh->draw();
+  for (auto name : m_names) {
+    auto mesh = m_meshes.at(name);
+    mesh->createModelViewMatrix(camTransform);
+    mesh->draw();
   }
 }
 

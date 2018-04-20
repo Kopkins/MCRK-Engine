@@ -260,9 +260,9 @@ initScene ()
   Light light (
     { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
 
-  g_scene.createMesh("second", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
-  g_scene.createMesh("first", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
-  //g_scene.setLight (light, g_shaderProgram);
+  g_scene.createMesh("Earth", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
+  g_scene.createMesh("Ship", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
+  g_scene.setLight (light, g_shaderProgram);
 
 }
 
@@ -402,7 +402,7 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
   if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
       auto* mesh = g_scene.getActive();
-      if (g_matIdx == 4)s
+      if (g_matIdx == 4)
 	g_matIdx = 1;
       else
 	++g_matIdx;

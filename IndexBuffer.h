@@ -2,6 +2,7 @@
 #define IndexBuffer_h
 
 #include <GL/glew.h>
+#include <vector>
 
 class IndexBuffer {
 

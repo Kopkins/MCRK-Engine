@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 Scene::Scene() :
-		m_names(), m_active(), m_meshs(), m_size(0) {
+		m_names(), m_active(), m_meshes(), m_size(0) {
 }
 
 void
@@ -12,12 +12,12 @@ Scene::setActive(std::string name) {
 
 Mesh*
 Scene::getMesh(std::string name) {
-  return m_meshs.at(name);
+  return m_meshes.at(name);
 }
 
 Mesh*
 Scene::getActive() {
-  return m_meshs.at(m_active);
+  return m_meshes.at(m_active);
 }
 
 std::string
@@ -29,7 +29,7 @@ Scene::getActiveName()
 void
 Scene::insertMesh(Mesh* mesh) {
   std::string name = "mesh" + std::to_string(m_size);
-  m_meshs.insert({name, mesh});
+  m_meshes.insert({name, mesh});
   m_names.insert(name);
   m_active = name;
   m_size++;
@@ -42,7 +42,7 @@ Scene::removeMesh(std::string name) {
     std::cout << "No more Mesh in Scene. Exiting" << std::endl;
     exit(-1);
   }
-  m_meshs.erase(name);
+  m_meshes.erase(name);
   m_names.erase(name);
   m_active = *(--m_names.end());
 }
@@ -64,7 +64,7 @@ Scene::createMesh (std::string name, std::string geomFile, std::string tex,
   mesh->setMaterial (material);
   mesh->activateMaterial ();
   mesh->prepareVao ();
-  m_meshs.insert ({ name, mesh });
+  m_meshes.insert ({ name, mesh });
   m_names.insert (name);
   m_active = name;
   m_size++;
@@ -94,7 +94,7 @@ Scene::draw(Camera cam) {
   float camTransform[16];
   cam.getTransform(camTransform);
   for (auto name : m_names) {
-    auto* mesh = m_meshs.at(name);
+    auto mesh = m_meshes.at(name);
     mesh->createModelViewMatrix(camTransform);
     mesh->draw();
   }

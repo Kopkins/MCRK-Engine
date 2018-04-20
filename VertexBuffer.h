@@ -2,6 +2,7 @@
 #define VertexBuffer_h
 
 #include <GL/glew.h>
+#include <vector>
 
 class VertexBuffer {
 

@@ -39,6 +39,9 @@ public:
   createMesh (std::string name, std::string geomFile, std::string tex,
 	      Material material, ShaderProgram& shader, int index=0);
 
+  void
+  addMesh (Mesh newMesh);
+
   const Light&
   getLight () const;
 
@@ -54,7 +57,7 @@ public:
 private:
   std::set<std::string> m_names;
   std::string m_active;
-  std::unordered_map<std::string, Mesh*> m_meshs;
+  std::unordered_map<std::string, Mesh*> m_meshes;
   Light m_light;
   int m_size;
 };

@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 Scene::Scene() :
-		m_names(), m_active(), m_meshes(), m_size(0) {
+		m_names(), m_active(), m_meshes(), m_lights(), m_size(0) {
 }
 
 void
@@ -70,24 +70,108 @@ Scene::createMesh (std::string name, std::string geomFile, std::string tex,
   m_size++;
 }
 
+void Scene::createLight (std::string name, std::string type, Vector3 diffuse, Vector3 specular, Vector3 position,
+        Vector3 attenuationCoefficient, Vector3 direction, float cutoffCosAngle,
+        float falloff)
+{
+    auto light = new Light(type, diffuse,specular,position,attenuationCoefficient,direction,cutoffCosAngle,falloff);
+    m_lights.insert({name,light});
+}
+
+void Scene::createLight (std::string name, Light* light){
+    m_lights.insert({name,light});
+}
+
 const Light&
 Scene::getLight() const {
   return m_light;
 }
 
 void
-Scene::setLight(const Light& light, ShaderProgram& shader) {
-  m_light = light;
+Scene::setLights(ShaderProgram& shader) {
   shader.enable();
 
-  GLint lightLoc = shader.getUniformLocation ("light.diffuse");
-  shader.setUniform3fv (lightLoc, 1, &m_light.diffuse.x);
-  lightLoc = shader.getUniformLocation ("light.specular");
-  shader.setUniform3fv (lightLoc, 1, &m_light.specular.x);
-  lightLoc = shader.getUniformLocation ("light.direction");
-  shader.setUniform3fv (lightLoc, 1, &m_light.direction.x);
+  GLint lightLoc;
+  int i = 0;
+  for (auto index = m_lights.begin(); index != m_lights.end(); ++index){
+    if (index->second->type=="spot"){
+        lightLoc = shader.getUniformLocation ("spotlights["+std::to_string(i)+std::string("].diffuse"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->diffuse.x);
+        lightLoc = shader.getUniformLocation ("spotlights["+std::to_string(i)+std::string("].specular"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->specular.x);
+        lightLoc = shader.getUniformLocation ("spotlights["+std::to_string(i)+std::string("].position"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->position.x);
+        lightLoc = shader.getUniformLocation("spotlights["+std::to_string(i)+std::string("].attenuationCoefficients"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->attenuationCoefficient.x);
+        lightLoc = shader.getUniformLocation("spotlights["+std::to_string(i)+std::string("].direction"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->direction.x);
+        lightLoc = shader.getUniformLocation("spotlights["+std::to_string(i)+std::string("].cutoffCosAngle"));
+        shader.setUniform1f (lightLoc, index->second->cutoffCosAngle);
+        lightLoc = shader.getUniformLocation("spotlights["+std::to_string(i)+std::string("].falloff"));
+        shader.setUniform1f (lightLoc, index->second->falloff);
+    }
+    
+
+    else if (index->second->type=="direction"){
+        lightLoc = shader.getUniformLocation ("directionlights["+std::to_string(i)+std::string("].diffuse"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->diffuse.x);
+        lightLoc = shader.getUniformLocation ("directionlights["+std::to_string(i)+std::string("].specular"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->specular.x);
+        lightLoc = shader.getUniformLocation ("directionlights["+std::to_string(i)+std::string("].position"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->position.x);
+        lightLoc = shader.getUniformLocation("directionlights["+std::to_string(i)+std::string("].attenuationCoefficients"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->attenuationCoefficient.x);
+        lightLoc = shader.getUniformLocation("directionlights["+std::to_string(i)+std::string("].direction"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->direction.x);
+        lightLoc = shader.getUniformLocation("directionlights["+std::to_string(i)+std::string("].cutoffCosAngle"));
+        shader.setUniform1f (lightLoc, index->second->cutoffCosAngle);
+        lightLoc = shader.getUniformLocation("directionlights["+std::to_string(i)+std::string("].falloff"));
+        shader.setUniform1f (lightLoc, index->second->falloff);
+    }
+    
+  
+    else if (index->second->type=="point"){
+        lightLoc = shader.getUniformLocation ("pointlights["+std::to_string(i)+std::string("].diffuse"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->diffuse.x);
+        lightLoc = shader.getUniformLocation ("pointlights["+std::to_string(i)+std::string("].specular"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->specular.x);
+        lightLoc = shader.getUniformLocation ("pointlights["+std::to_string(i)+std::string("].position"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->position.x);
+        lightLoc = shader.getUniformLocation("pointlights["+std::to_string(i)+std::string("].attenuationCoefficients"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->attenuationCoefficient.x);
+        lightLoc = shader.getUniformLocation("pointlights["+std::to_string(i)+std::string("].direction"));
+        shader.setUniform3fv (lightLoc, 1, &index->second->direction.x);
+        lightLoc = shader.getUniformLocation("pointlights["+std::to_string(i)+std::string("].cutoffCosAngle"));
+        shader.setUniform1f (lightLoc, index->second->cutoffCosAngle);
+        lightLoc = shader.getUniformLocation("pointlights["+std::to_string(i)+std::string("].falloff"));
+        shader.setUniform1f (lightLoc, index->second->falloff);
+    }
+    i++;
+  }
+
+
+
+  /*
+  GLint lightLoc = shader.getUniformLocation ("spotlights[0].diffuse");
+  shader.setUniform3fv (lightLoc, 1, &m_lights.at("spot1")->diffuse.x);
+  lightLoc = shader.getUniformLocation ("spotlights[0].specular");
+  shader.setUniform3fv (lightLoc, 1, &m_lights.at("spot1")->specular.x);
+  lightLoc = shader.getUniformLocation ("spotlights[0].position");
+  shader.setUniform3fv (lightLoc, 1, &m_lights.at("spot1")->position.x);
+  lightLoc = shader.getUniformLocation("spotlights[0].attenuationCoefficients");
+  shader.setUniform3fv (lightLoc, 1, &m_lights.at("spot1")->attenuationCoefficient.x);
+  lightLoc = shader.getUniformLocation("spotlights[0].direction");
+  shader.setUniform3fv (lightLoc, 1, &m_lights.at("spot1")->direction.x);
+  lightLoc = shader.getUniformLocation("spotlights[0].cutoffCosAngle");
+  shader.setUniform1f (lightLoc, m_lights.at("spot1")->cutoffCosAngle);
+  lightLoc = shader.getUniformLocation("spotlights[0].falloff");
+  shader.setUniform1f (lightLoc, m_lights.at("spot1")->falloff);
+  */
+
   shader.disable();
 }
+
+
 
 void
 Scene::draw(Camera cam) {

@@ -156,9 +156,9 @@ ShaderProgram::setUniform3fv (int uniformlocation, int count, float* vector)
 }
 
 void
-ShaderProgram::setUniform1f (int uniformlocation, float floot)
+ShaderProgram::setUniform1f (int uniformlocation, float value)
 {
-  glUniform1f (uniformlocation, floot);
+  glUniform1f (uniformlocation, value);
 }
 
 void

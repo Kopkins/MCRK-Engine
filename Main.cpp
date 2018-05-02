@@ -264,6 +264,10 @@ initScene ()
   g_scene.createLight("spot1", light);
   light = new Light("spot",{1,1,0},{0.1,0.1,0.1},{-1,0,1},{0.1,0.1,0.1},{0,0,-1},.99,100);
   g_scene.createLight("spot2", light);
+  light = new Light("direction",{0,1,0},{0.1,0.1,0.1},{0,-1,0},{0,0,0},{0,1,0},0,0);
+  g_scene.createLight("direction1",light);
+  light = new Light("point",{0,0,1},{0.05,0.05,0.05},{0,1,0},{0.1,0.1,0.1},{0,-1,0},0,0);
+  g_scene.createLight("point1",light);
 
   g_scene.createMesh("Earth", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
   g_scene.createMesh("Ship", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);

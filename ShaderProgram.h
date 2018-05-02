@@ -40,6 +40,9 @@ public:
   void
   setUniform1f (int uniformlocation, float value);
 
+  void
+  setUniform1i (int uniformlocation, int value);
+
   //void
   //setUniform3fv ();
 

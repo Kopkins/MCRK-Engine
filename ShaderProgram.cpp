@@ -162,6 +162,12 @@ ShaderProgram::setUniform1f (int uniformlocation, float value)
 }
 
 void
+ShaderProgram::setUniform1i (int uniformlocation, int value)
+{
+  glUniform1i(uniformlocation,value);
+}
+
+void
 ShaderProgram::enable ()
 {
   glUseProgram (m_programId);

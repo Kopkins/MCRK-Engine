@@ -25,7 +25,7 @@ namespace
   struct MouseHandler
   {
     MouseHandler () :
-	x (), y (), lClick (false), rClick (false)
+    x (), y (), lClick (false), rClick (false)
     {
     }
 
@@ -81,14 +81,14 @@ updateCamera (KeyBuffer keybuffer, float moveDelta, float rotateDelta);
 
 void
 updateMesh (KeyBuffer buffer, float moveDelta, float rotateDelta,
-	    float shearDelta);
+        float shearDelta);
 
 void
 drawScene (GLFWwindow* window);
 
 void
 processKey (GLFWwindow* window, int key, int scanCode, int action,
-	    int modifiers);
+        int modifiers);
 
 void
 processMousePosition (GLFWwindow* window, double x, double y);
@@ -208,8 +208,8 @@ initGlew ()
   if (status != GLEW_OK)
     {
       fprintf (stderr, "Failed to initialize GLEW"
-	       " (%s).\n",
-	       glewGetErrorString (status));
+           " (%s).\n",
+           glewGetErrorString (status));
       exit (-1);
     }
   auto version = glewGetString (GLEW_VERSION);
@@ -257,12 +257,21 @@ initScene ()
     { 0, 0, 0 },{ 0.5, 0.5, 0.5 },{ 0.5, 0.5,0.5 },84.0f);
   g_materials.push_back (mat);
 
-  Light light (
-    { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
+  //Light light(
+  //  { 0.1, 0.1, 0.1 },{ 1.0, 1.0, 1.0 },{0,0,0},{0,0,0},{ 0, 0, 1 },0,0);
+
+  Light* light = new Light("spot",{1,0,0},{0.1,0.1,0.1},{1,0,1},{0.1,0.1,0.1},{0,0,-1},.99,100);
+  g_scene.createLight("spot1", light);
+  light = new Light("spot",{1,1,0},{0.1,0.1,0.1},{-1,0,1},{0.1,0.1,0.1},{0,0,-1},.99,100);
+  g_scene.createLight("spot2", light);
+  light = new Light("direction",{0,1,0},{0.1,0.1,0.1},{0,-1,0},{0,0,0},{0,1,0},0,0);
+  g_scene.createLight("direction1",light);
+  light = new Light("point",{0,0,1},{0.05,0.05,0.05},{0,1,0},{0.1,0.1,0.1},{0,-1,0},0,0);
+  g_scene.createLight("point1",light);
 
   g_scene.createMesh("Earth", "Sphere.obj", "EarthBath.png", *mat, g_shaderProgram);
   g_scene.createMesh("Ship", "Sample_Ship.obj", "sh3.jpg", *mat, g_shaderProgram);
-  g_scene.setLight (light, g_shaderProgram);
+  g_scene.setLights(g_shaderProgram);
 
 }
 
@@ -320,7 +329,7 @@ updateCamera (KeyBuffer keybuffer, float moveDelta, float rotateDelta)
 /******************************************************************/
 void
 updateMesh (KeyBuffer keybuffer, float moveDelta, float rotateDelta,
-	    float shearDelta)
+        float shearDelta)
 {
   std::bitset<GLFW_KEY_LAST> buffer = keybuffer.getBuffer ();
   Mesh* mesh = g_scene.getActive();
@@ -339,10 +348,10 @@ updateMesh (KeyBuffer keybuffer, float moveDelta, float rotateDelta,
     mesh->scaleWorld (shearDelta);
   mesh->shearLocalXByYz (
       buffer[GLFW_KEY_8] * shearDelta, buffer[GLFW_KEY_8] * shearDelta);
-  //mesh->shearLocalYByXz (
-  //    buffer[GLFW_KEY_9] * shearDelta, buffer[GLFW_KEY_9] * shearDelta);
-  //mesh->shearLocalZByXy (
-  //    buffer[GLFW_KEY_0] * shearDelta, buffer[GLFW_KEY_0] * shearDelta);
+  mesh->shearLocalYByXz (
+      buffer[GLFW_KEY_9] * shearDelta, buffer[GLFW_KEY_9] * shearDelta);
+  mesh->shearLocalZByXy (
+      buffer[GLFW_KEY_0] * shearDelta, buffer[GLFW_KEY_0] * shearDelta);
 }
 
 /******************************************************************/
@@ -360,7 +369,7 @@ drawScene (GLFWwindow* window)
 
 void
 processKey (GLFWwindow* window, int key, int scanCode, int action,
-	    int modifiers)
+        int modifiers)
 {
 
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -377,35 +386,35 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
     }
   if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
     {
-	  g_scene.removeMesh(g_scene.getActiveName());
+      g_scene.removeMesh(g_scene.getActiveName());
     }
   if (key == GLFW_KEY_P && action == GLFW_PRESS)
     {
       if (g_cam.isOrtho ())
-	g_cam.createProjectionMatrix (g_shaderProgram);
+    g_cam.createProjectionMatrix (g_shaderProgram);
       else
-	g_cam.createProjectionMatrix (g_shaderProgram, true);
+    g_cam.createProjectionMatrix (g_shaderProgram, true);
     }
   if (key == GLFW_KEY_I && action == GLFW_PRESS)
     {
       if (g_isWire)
-	{
-	  glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	  g_isWire=false;
-	}
+    {
+      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+      g_isWire=false;
+    }
       else
-	{
-	  glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	  g_isWire=true;
-	}
+    {
+      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+      g_isWire=true;
+    }
     }
   if (key == GLFW_KEY_M && action == GLFW_PRESS)
     {
       auto* mesh = g_scene.getActive();
       if (g_matIdx == 4)
-	g_matIdx = 1;
+    g_matIdx = 1;
       else
-	++g_matIdx;
+    ++g_matIdx;
       mesh->setMaterial(*(g_materials[g_matIdx]));
       mesh->activateMaterial();
     }
@@ -413,7 +422,7 @@ processKey (GLFWwindow* window, int key, int scanCode, int action,
     {
       g_cWeight += 0.1f;
       if (g_cWeight > 1.0f)
-	g_cWeight = 0.0f;
+    g_cWeight = 0.0f;
 
       g_shaderProgram.enable();
       GLint loc = g_shaderProgram.getUniformLocation("colorWeight");
@@ -465,7 +474,7 @@ void
 processMouseButton (GLFWwindow* window, int button, int action, int modifiers)
 {
   if (button == GLFW_MOUSE_BUTTON_LEFT) {
-	  g_mouse.lClick = action;
+      g_mouse.lClick = action;
 
   } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
       g_mouse.rClick = action;

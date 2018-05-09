@@ -42,11 +42,22 @@ public:
   void
   addMesh (Mesh newMesh);
 
+  void
+  createLight (std::string name, std::string type, Vector3 diffuse, Vector3 specular, Vector3 position,
+        Vector3 attenuationCoefficient, Vector3 direction, float cutoffCosAngle,
+        float falloff);
+
+  void
+  createLight(std::string name, Light* Light);
+
+  void
+  addLight (const Light& light);
+
   const Light&
   getLight () const;
 
   void
-  setLight (const Light& light, ShaderProgram& shader);
+  setLights (ShaderProgram& shader);
 
   void
   draw (Camera cam);
@@ -58,6 +69,7 @@ private:
   std::set<std::string> m_names;
   std::string m_active;
   std::unordered_map<std::string, Mesh*> m_meshes;
+  std::unordered_map<std::string, Light*> m_lights;
   Light m_light;
   int m_size;
 };

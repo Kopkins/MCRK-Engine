@@ -38,10 +38,13 @@ public:
   setUniform3fv (int uniformlocation, int count, float* vector);
 
   void
-  setUniform1f (int uniformlocation, float floot);
+  setUniform1f (int uniformlocation, float value);
 
   void
-  setUniform3fv ();
+  setUniform1i (int uniformlocation, int value);
+
+  //void
+  //setUniform3fv ();
 
   void
   enable ();
